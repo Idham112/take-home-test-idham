@@ -1,115 +1,219 @@
-import Image from "next/image";
-import localFont from "next/font/local";
+import React, { useEffect, useState } from "react";
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-});
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-});
+function Dominoes() {
+  const [initDominoes, setInitDominoes] = useState<number[][]>([
+    [6, 1],
+    [4, 3],
+    [5, 1],
+    [3, 4],
+    [1, 1],
+    [2, 2],
+    [3, 3],
+    [4, 4],
+    [3, 4],
+    [1, 2],
+  ]);
+  const [dominoes, setDominoes] = useState<number[][]>(initDominoes);
+  const [doubleNumber, setDoubleNumber] = useState<number>(0);
+  const [inputValue, setInputValue] = useState<number>(0);
 
-export default function Home() {
+  function findDoubleNumbers() {
+    let index = 0;
+    let count = 0;
+    while (index < dominoes.length - 1) {
+      if (dominoes[index][0] === dominoes[index][1]) {
+        count++;
+      }
+      index++;
+    }
+    setDoubleNumber(count);
+  }
+
+  function sortAscDominoes() {
+    const sortedDominoes = [...dominoes].sort((a, b) => {
+      return (a[0] + a[1]) - (b[0] + b[1]);
+    });
+    setDominoes(sortedDominoes);
+  }
+
+  function sortDescDominoes() {
+    const sortedDominoes = [...dominoes].sort((a, b) => {
+      return (b[0] + b[1]) - (a[0] + a[1]);
+    });
+    setDominoes(sortedDominoes);
+  }
+
+  function flipDominoes() {
+    let index = 0;
+    let flippedDominoes = [];
+    while (index < dominoes.length) {
+      let container = [];
+      container.push(dominoes[index][1]);
+      container.push(dominoes[index][0]);
+      flippedDominoes.push(container);
+      index++;
+    }
+    setDominoes(flippedDominoes);
+  }
+
+  function removeDupe() {
+    let dupes: number[][] = [];
+    let removeDupes: number[][] = [];
+    for (let i = 0; i < dominoes.length; i++) {
+      for (let y = 0; y < dominoes.length; y++) {
+        if (i === y) {
+        } else {
+          if (
+            (dominoes[i][0] === dominoes[y][0] &&
+              dominoes[i][1] === dominoes[y][1]) ||
+            (dominoes[i][0] === dominoes[y][1] &&
+              dominoes[i][1] === dominoes[y][0])
+          ) {
+            const checkInDupes = dupes.some(
+              (dupes) =>
+                (dupes[0] === dominoes[i][0] && dupes[1] === dominoes[i][1]) ||
+                (dupes[0] === dominoes[i][1] && dupes[1] === dominoes[i][0])
+            );
+            if (!checkInDupes) {
+              dupes.push(dominoes[i]);
+            }
+          }
+        }
+      }
+    }
+    for (let i = 0; i < dupes.length; i++) {
+      for (let y = 0; y < dominoes.length; y++) {
+        if (
+          (dupes[i][0] === dominoes[y][0] && dupes[i][1] === dominoes[y][1]) ||
+          (dupes[i][0] === dominoes[y][1] && dupes[i][1] === dominoes[y][0])
+        ) {
+          const checkInRemoveDupe = removeDupes.some(
+            (removeDupes) =>
+              (removeDupes[0] === dominoes[y][0] &&
+                removeDupes[1] === dominoes[y][1]) ||
+              (removeDupes[0] === dominoes[y][1] &&
+                removeDupes[1] === dominoes[y][0])
+          );
+          if (!checkInRemoveDupe) {
+            removeDupes.push(dominoes[y]);
+          }
+        }
+      }
+    }
+    setDominoes(removeDupes);
+  }
+
+  function resetDominoes(){
+    setDominoes(initDominoes);
+  }
+
+  function removeTotal(input: number){
+    const removed: number[][] = []
+    dominoes.forEach(element => {
+      if((element[0] + element[1]) != input){
+        removed.push(element);
+      }
+    });
+    setDominoes(removed);
+    setInputValue(0);
+  }
+
+  useEffect(() => {
+    findDoubleNumbers();
+  }, [dominoes]);
+
   return (
-    <div
-      className={`${geistSans.variable} ${geistMono.variable} grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]`}
-    >
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/pages/index.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div className="w-screen h-screen flex flex-col justify-center items-center bg-violet-300 text-black">
+      <div className="w-fit h-fit bg-white p-7 grid grid-cols-1 gap-2 border border-slate-600 rounded-md">
+        <div className="font-bold text-2xl">Dominoes</div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Source */}
+        <div className="bg-slate-100 p-3 pt-1 border rounded-md border-slate-300">
+          <h2 className="font-semibold">Source</h2>
+          <div className="flex">
+            [
+            {initDominoes.map((number, index) => (
+              <div key={index}>
+                [{number[0]}, {number[1]}]
+              </div>
+            ))}
+            ]
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+
+        {/* Double Numbers */}
+        <div className="bg-slate-100 p-3 pt-1 border rounded-md border-slate-300">
+          <h2 className="font-semibold">Double Numbers</h2>
+          <div className="flex">{doubleNumber}</div>
+        </div>
+
+        {/* Dominoes Visualization */}
+        <div className="flex gap-5">
+          {dominoes.map((number, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-1 place-items-center border rounded-sm border-black w-4"
+            >
+              <p>{number[0]}</p>
+              <p>-</p>
+              <p>{number[1]}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* buttons */}
+        <div className="flex gap-2">
+          <button
+            className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={sortAscDominoes}
+          >
+            Sort (ASC)
+          </button>
+          <button
+            className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={sortDescDominoes}
+          >
+            Sort (DESC)
+          </button>
+          <button
+            className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={flipDominoes}
+          >
+            Flip
+          </button>
+          <button
+            className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={removeDupe}
+          >
+            Remove Dup
+          </button>
+          <button 
+          className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+          onClick={resetDominoes}
+          >
+            Reset
+          </button>
+        </div>
+
+        {/* input and remove */}
+        <div className="flex flex-col">
+          <input
+            className="border border-slate-400 rounded-md px-2"
+            type="number"
+            placeholder="input number"
+            value={inputValue}
+            onChange={(e: any) => setInputValue(e.target.value)}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <button 
+          className="w-1/4 text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+          onClick={() => removeTotal(inputValue)}
+          >
+            Remove
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
+
+export default Dominoes;
