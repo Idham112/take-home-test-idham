@@ -20,7 +20,7 @@ function Dominoes() {
   function findDoubleNumbers() {
     let index = 0;
     let count = 0;
-    while (index < dominoes.length - 1) {
+    while (index < dominoes.length) {
       if (dominoes[index][0] === dominoes[index][1]) {
         count++;
       }
@@ -31,14 +31,14 @@ function Dominoes() {
 
   function sortAscDominoes() {
     const sortedDominoes = [...dominoes].sort((a, b) => {
-      return (a[0] + a[1]) - (b[0] + b[1]);
+      return a[0] + a[1] - (b[0] + b[1]);
     });
     setDominoes(sortedDominoes);
   }
 
   function sortDescDominoes() {
     const sortedDominoes = [...dominoes].sort((a, b) => {
-      return (b[0] + b[1]) - (a[0] + a[1]);
+      return b[0] + b[1] - (a[0] + a[1]);
     });
     setDominoes(sortedDominoes);
   }
@@ -60,57 +60,46 @@ function Dominoes() {
     let dupes: number[][] = [];
     let removeDupes: number[][] = [];
     for (let i = 0; i < dominoes.length; i++) {
-      for (let y = 0; y < dominoes.length; y++) {
-        if (i === y) {
-        } else {
+      const isDuplicate = dupes.some(
+        (dupe) =>
+          (dupe[0] === dominoes[i][0] && dupe[1] === dominoes[i][1]) ||
+          (dupe[0] === dominoes[i][1] && dupe[1] === dominoes[i][0])
+      );
+      if (!isDuplicate) {
+        for (let y = i + 1; y < dominoes.length; y++) {
           if (
             (dominoes[i][0] === dominoes[y][0] &&
               dominoes[i][1] === dominoes[y][1]) ||
             (dominoes[i][0] === dominoes[y][1] &&
               dominoes[i][1] === dominoes[y][0])
           ) {
-            const checkInDupes = dupes.some(
-              (dupes) =>
-                (dupes[0] === dominoes[i][0] && dupes[1] === dominoes[i][1]) ||
-                (dupes[0] === dominoes[i][1] && dupes[1] === dominoes[i][0])
-            );
-            if (!checkInDupes) {
-              dupes.push(dominoes[i]);
-            }
+            dupes.push(dominoes[i]);
           }
         }
       }
     }
-    for (let i = 0; i < dupes.length; i++) {
-      for (let y = 0; y < dominoes.length; y++) {
-        if (
-          (dupes[i][0] === dominoes[y][0] && dupes[i][1] === dominoes[y][1]) ||
-          (dupes[i][0] === dominoes[y][1] && dupes[i][1] === dominoes[y][0])
-        ) {
-          const checkInRemoveDupe = removeDupes.some(
-            (removeDupes) =>
-              (removeDupes[0] === dominoes[y][0] &&
-                removeDupes[1] === dominoes[y][1]) ||
-              (removeDupes[0] === dominoes[y][1] &&
-                removeDupes[1] === dominoes[y][0])
-          );
-          if (!checkInRemoveDupe) {
-            removeDupes.push(dominoes[y]);
-          }
-        }
+
+    for (let i = 0; i < dominoes.length; i++) {
+      const isDuplicate = dupes.some(
+        (dupe) =>
+          (dupe[0] === dominoes[i][0] && dupe[1] === dominoes[i][1]) ||
+          (dupe[0] === dominoes[i][1] && dupe[1] === dominoes[i][0])
+      );
+      if(!isDuplicate){
+        removeDupes.push(dominoes[i]);
       }
     }
     setDominoes(removeDupes);
   }
 
-  function resetDominoes(){
+  function resetDominoes() {
     setDominoes(initDominoes);
   }
 
-  function removeTotal(input: number){
-    const removed: number[][] = []
-    dominoes.forEach(element => {
-      if((element[0] + element[1]) != input){
+  function removeTotal(input: number) {
+    const removed: number[][] = [];
+    dominoes.forEach((element) => {
+      if (element[0] + element[1] != input) {
         removed.push(element);
       }
     });
@@ -187,9 +176,9 @@ function Dominoes() {
           >
             Remove Dup
           </button>
-          <button 
-          className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
-          onClick={resetDominoes}
+          <button
+            className="text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={resetDominoes}
           >
             Reset
           </button>
@@ -204,9 +193,9 @@ function Dominoes() {
             value={inputValue}
             onChange={(e: any) => setInputValue(e.target.value)}
           />
-          <button 
-          className="w-1/4 text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
-          onClick={() => removeTotal(inputValue)}
+          <button
+            className="w-1/4 text-white bg-blue-500 border rounded-md px-3 hover:bg-blue-600"
+            onClick={() => removeTotal(inputValue)}
           >
             Remove
           </button>
